@@ -1,0 +1,5 @@
+{
+  "CosmosDBFixtureSettings": {
+    "Cleanup": false
+  }
+}

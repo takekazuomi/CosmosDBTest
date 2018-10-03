@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CosmosDBTest.Common;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using Xunit.Abstractions;
 
 namespace UniqueTest.Fixtures
@@ -27,7 +28,7 @@ namespace UniqueTest.Fixtures
             return UriFactory.CreateDocumentCollectionUri(DB.DatabaseId, DB.CollectionId);
         }
 
-        protected async Task<dynamic> CreateDocuments(dynamic[] data, string message)
+        protected async Task<dynamic[]> CreateDocuments(dynamic[] data, string message)
         {
             var results = new List<dynamic>();
 
@@ -45,7 +46,24 @@ namespace UniqueTest.Fixtures
                 }
             }
 
-            return results;
+            return results.ToArray();
+        }
+
+        protected async Task DumpQuery(string query)
+        {
+            var result = Client
+                .CreateDocumentQuery(CreateDocumentCollectionUri(), query)
+                .AsDocumentQuery();
+
+            while (result.HasMoreResults)
+            {
+                var feed = await result.ExecuteNextAsync();
+                Output.WriteLine("query:{0}, activityId:{1},requestCharge:{2},count:{3}", query, feed.ActivityId, feed.RequestCharge, feed.Count);
+                foreach (var o in feed)
+                {
+                    Output.WriteLine(Dump(o));
+                }
+            }
         }
 
         protected string Dump(object o)

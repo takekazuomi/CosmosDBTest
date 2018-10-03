@@ -5,8 +5,9 @@
   "uniqueKeys": [
     {
       "paths": [
-        "/uid1"
+        "/uid1",
+        "/uid2"
       ]
     }
   ]
-}}
+}

@@ -25,21 +25,27 @@ namespace UniqueTest
         [Fact]
         public async Task CreateDocumentTest()
         {
-            dynamic[] uniqueData = 
+            dynamic[] uniqueData =
             {
-                new {test = 1}
+                new {test = 1},
+                new {test = 2}
             };
 
             await CreateDocuments(uniqueData, "CreateDocumentTest");
 
             var query = Client
-                .CreateDocumentQuery(CreateDocumentCollectionUri(), "select * from col where col.test = 1")
+//                .CreateDocumentQuery(CreateDocumentCollectionUri(), "select * from c where c.test = 1")
+                .CreateDocumentQuery(CreateDocumentCollectionUri(), "select * from c")
                 .AsDocumentQuery();
 
             while (query.HasMoreResults)
             {
                 var feed = await query.ExecuteNextAsync();
                 Output.WriteLine("{0}:{1},{2}", feed.ActivityId, feed.RequestCharge, feed.Count);
+                foreach (var o in feed)
+                {
+                    Output.WriteLine(Dump(o));
+                }
             }
         }
     }

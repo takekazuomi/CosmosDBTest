@@ -35,7 +35,7 @@ namespace UniqueTest
             var json = JsonConvert.SerializeObject(uniqueKeyPolicy);
             _output.WriteLine(json);
 
-            Assert.Matches("", json);
+            Assert.Matches(".+/uid1.+", json);
         }
 
     }

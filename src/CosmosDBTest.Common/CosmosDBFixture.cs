@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
@@ -25,11 +26,13 @@ namespace CosmosDBTest.Common
         private readonly IMessageSink _messageSink;
         private CosmosDBFixtureSettings _settings;
 
+        private string _settingFilename;
+
         private string _accountEndpoint;
         private string _accountKey;
 
-        public string DatabaseId { get; } = "db";
-        public string CollectionId { get; } = "col";
+        public string DatabaseId { get; }
+        public string CollectionId { get; }
 
         private IDocumentClient _documentClient;
         public IDocumentClient DocumentClient
@@ -88,19 +91,24 @@ namespace CosmosDBTest.Common
             ConnectionProtocol = Protocol.Https
         };
 
-        public CosmosDBFixture(IMessageSink messageSink)
+        public CosmosDBFixture(IMessageSink messageSink, string settingFilename)
         {
-            // _output = output;
+            _settingFilename = settingFilename;
+
+            var id = settingFilename.Split("/").LastOrDefault()?.ToLower().Replace(".json","");
+            DatabaseId = "db-" + id;
+            CollectionId = "col";
+
             _messageSink = messageSink;
             _messageSink.OnMessage(new DiagnosticMessage("DatabaseFixture constructor message"));
         }
 
-        protected void Initialize(string settingFilename)
+        protected void Initialize()
         {
             var builder = new ConfigurationBuilder();
             builder
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(settingFilename)
+                .AddJsonFile(_settingFilename)
                 .AddUserSecrets<CosmosDBFixture>();
             IConfiguration configuration = builder.Build();
             _settings = configuration.Get<CosmosDBFixtureSettings>();
@@ -136,6 +144,7 @@ namespace CosmosDBTest.Common
             if (PartitionKeyDefinition != null)
                 documentCollection.PartitionKey = PartitionKeyDefinition;
 
+            Thread.Sleep(1000); // Emulator だとエラーになるので、少し待つ。
             await documentClient.CreateDocumentCollectionIfNotExistsAsync(
                 UriFactory.CreateDatabaseUri(DatabaseId),
                 documentCollection,
@@ -147,9 +156,12 @@ namespace CosmosDBTest.Common
         private async Task Cleanup(IDocumentClient client)
         {
             var database = client.CreateDatabaseQuery().Where(db => db.Id == DatabaseId).AsEnumerable().FirstOrDefault();
-            if(database != null)
+            if (database != null)
+            {
+                _messageSink.OnMessage(new DiagnosticMessage($"DeleteDatabaseAsync: {DatabaseId}, {database != null}"));
                 await client.DeleteDatabaseAsync(UriFactory.CreateDatabaseUri(DatabaseId));
- 
+            }
+
            _messageSink.OnMessage(new DiagnosticMessage($"DeleteDatabaseAsync: {DatabaseId}, {database != null}"));
         }
 

@@ -52,14 +52,14 @@ namespace UniqueTest
         {
             var uniqueData = new[]
             {
-                new {id="1"}
+                new {id="2"}
             };
 
             await CreateDocuments(uniqueData, "SimpleIdViolationTest");
 
             var conflictData = new[]
             {
-                new {id="1"}
+                new {id="2"}
             };
 
             var exception = await Assert.ThrowsAnyAsync<DocumentClientException>(() => CreateDocuments( conflictData, "conflictData"));
@@ -79,14 +79,14 @@ namespace UniqueTest
         {
             var uniqueData = new[]
             {
-                new {id="2", uid1=2}
+                new {id="3", uid1=2}
             };
 
             await CreateDocuments(uniqueData, "SimpleIdUniqueViolationTest");
 
             var conflictData = new[]
             {
-                new {id="2", uid1=2}
+                new {id="3", uid1=2}
             };
 
             var exception = await Assert.ThrowsAnyAsync<DocumentClientException>(() => CreateDocuments( conflictData, "conflictData"));

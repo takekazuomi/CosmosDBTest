@@ -5,9 +5,9 @@ namespace UniqueTest.Fixtures
 {
     public class SingleUniqueFixture : CosmosDBFixture
     {
-        public SingleUniqueFixture(IMessageSink messageSink) : base(messageSink)
+        public SingleUniqueFixture(IMessageSink messageSink) : base(messageSink, "Fixtures/SingleUniqueFixture.json")
         {
-            Initialize("Fixtures/SingleUniqueFixture.json");
+            Initialize();
         }
     }
 }

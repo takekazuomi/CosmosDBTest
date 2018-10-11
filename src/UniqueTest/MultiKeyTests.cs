@@ -1,11 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
-using CosmosDBTest.Common;
 using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.Documents.Linq;
 using UniqueTest.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
@@ -27,8 +22,8 @@ namespace UniqueTest
         {
             dynamic[] uniqueData =
             {
-                new {uid1=1, uid2=1},
-                new {uid1=2, uid2=2}
+                new {uid1 = 1, uid2 = 1},
+                new {uid1 = 2, uid2 = 2}
             };
 
             await CreateDocuments(uniqueData, "SimpleUniqueTest");
@@ -41,11 +36,11 @@ namespace UniqueTest
         {
             dynamic[] data =
             {
-                new {uid1 = 2, uid2 = 1},
-                new {uid1 = 2, uid2 = 2}
+                new {uid1 = 3, uid2 = 3},
+                new {uid1 = 3, uid2 = 4}
             };
 
-            var exception = await Assert.ThrowsAnyAsync<DocumentClientException>(() => CreateDocuments( data, "conflictData"));
+            var exception = await Assert.ThrowsAnyAsync<DocumentClientException>(() => CreateDocuments(data, "conflictData"));
 
             Assert.True(exception.StatusCode == HttpStatusCode.Conflict);
             Assert.Matches(".+Unique index constraint violation.+", exception.Message);

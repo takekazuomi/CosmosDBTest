@@ -26,7 +26,7 @@ namespace CosmosDBTest.Common
         private readonly IMessageSink _messageSink;
         private CosmosDBFixtureSettings _settings;
 
-        private string _settingFilename;
+        private readonly string _settingFilename;
 
         private string _accountEndpoint;
         private string _accountKey;
@@ -84,12 +84,8 @@ namespace CosmosDBTest.Common
         }
 
 
-        private readonly ConnectionPolicy _connectionPolicy = new ConnectionPolicy
-        {
-            UserAgentSuffix = " unique-net/3", 
-            ConnectionMode = ConnectionMode.Direct,
-            ConnectionProtocol = Protocol.Https
-        };
+        private ConnectionPolicy _connectionPolicy;
+
 
         public CosmosDBFixture(IMessageSink messageSink, string settingFilename)
         {
@@ -110,16 +106,21 @@ namespace CosmosDBTest.Common
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(_settingFilename)
                 .AddUserSecrets<CosmosDBFixture>();
+
             IConfiguration configuration = builder.Build();
-            _settings = configuration.Get<CosmosDBFixtureSettings>();
 
-            var uniqueKeyPolicy = configuration.Get<UniqueKeyPolicy>();
-            if (uniqueKeyPolicy != null)
-                UniqueKeyPolicy = uniqueKeyPolicy;
+            _settings = configuration.GetOrDefault("cosmosDBFixtureSettings", ()=>new CosmosDBFixtureSettings());
 
-            var partitionKeyDefinition = configuration.Get<PartitionKeyDefinition>();
-            if (partitionKeyDefinition != null && partitionKeyDefinition.Paths?.Count > 0)
-                PartitionKeyDefinition = partitionKeyDefinition;
+            _connectionPolicy = configuration.GetOrDefault("connectionPolicy", ()=> new ConnectionPolicy
+            {
+                UserAgentSuffix = " unique-net/3",
+                ConnectionMode = ConnectionMode.Direct,
+                ConnectionProtocol = Protocol.Https
+            });
+
+            _uniqueKeyPolicy = configuration.GetOrDefault("uniqueKeyPolicy", ()=> new UniqueKeyPolicy());
+
+            _partitionKeyDefinition = configuration.GetOrDefault<PartitionKeyDefinition>("partitionKeyDefinition");
 
             _accountEndpoint = configuration.GetSection("CosmosDB:AccountEndpoint").Value;
             _accountKey = configuration.GetSection("CosmosDB:AccountKey").Value;

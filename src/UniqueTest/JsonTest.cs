@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Azure.Documents;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -38,5 +36,21 @@ namespace UniqueTest
             Assert.Matches(".+/uid1.+", json);
         }
 
+        [Fact]
+        public void ConnectionPolicyTest()
+        {
+
+            var connectionPolicy = new ConnectionPolicy
+            {
+                UserAgentSuffix = " unique-net/3",
+                ConnectionMode = ConnectionMode.Direct,
+                ConnectionProtocol = Protocol.Https
+            };
+
+            var json = JsonConvert.SerializeObject(connectionPolicy);
+            _output.WriteLine(json);
+
+            Assert.Matches(".+unique-net/3.+", json);
+        }
     }
 }

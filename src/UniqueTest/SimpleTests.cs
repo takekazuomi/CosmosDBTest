@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using CosmosDBTest.Common;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
+﻿using System.Threading.Tasks;
 using Microsoft.Azure.Documents.Linq;
 using UniqueTest.Fixtures;
 using Xunit;

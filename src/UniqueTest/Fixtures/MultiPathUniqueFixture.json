@@ -1,13 +1,15 @@
 {
-  "CosmosDBFixtureSettings": {
-    "Cleanup": false
+  "cosmosDBFixtureSettings": {
+    "cleanup": false
   },
-  "uniqueKeys": [
-    {
-      "paths": [
-        "/uid1",
-        "/uid2"
-      ]
-    }
-  ]
+  "uniqueKeyPolicy": {
+    "uniqueKeys": [
+      {
+        "paths": [
+          "/uid1",
+          "/uid2"
+        ]
+      }
+    ]
+  }
 }

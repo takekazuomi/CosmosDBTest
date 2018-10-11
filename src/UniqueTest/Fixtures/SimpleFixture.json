@@ -1,5 +1,10 @@
 {
-  "CosmosDBFixtureSettings": {
-    "Cleanup": false
+  "cosmosDBFixtureSettings": {
+    "cleanup": false
+  },
+  "connectionPolicy": {
+    "connectionMode": 1,
+    "connectionProtocol": 1,
+    "userAgentSuffix": " unique-net/3"
   }
 }
